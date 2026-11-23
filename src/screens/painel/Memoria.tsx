@@ -120,8 +120,8 @@ export function Memoria() {
       valor: negativo(r.irAno),
     },
     {
-      item: "Custos fixos",
-      como: `(${brl(p.contador, 0)} contador + ${brl(p.taxas, 0)} taxas + ${brl(r.assinaturaMes, 0)} assinatura + ${brl(p.outros, 0)} outros) × 12`,
+      item: "Custos do mês",
+      como: `(${brl(p.contador, 0)} contador + ${brl(p.taxas, 0)} taxas + ${brl(p.outros, 0)} outros gastos) × 12`,
       valor: negativo(r.fixosAno),
     },
     { item: "Líquido por ano", valor: brl(r.liquido), tipo: "total" },
@@ -140,7 +140,7 @@ export function Memoria() {
     },
     {
       item: "Lucro distribuído",
-      como: `faturamento − DAS − pró-labore − custos fixos, sem IR (${mil(r.lucro / 12)} por mês)`,
+      como: `faturamento − DAS − pró-labore − custos do mês, sem IR (${mil(r.lucro / 12)} por mês)`,
       valor: brl(r.lucro),
     },
   ];

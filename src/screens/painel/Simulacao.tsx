@@ -9,6 +9,7 @@ import { CAMPOS, LIMITES, limiteDe } from "../../dominio/estado.ts";
 import { useConsultor, useResultado } from "../../estado/ConsultorContext";
 import { brl, numero } from "../../lib/formato";
 import { faixaDoBruto } from "./escala.ts";
+import { OutrosGastos } from "./OutrosGastos";
 
 const REGRAS_PRO_LABORE = [
   {
@@ -274,41 +275,13 @@ export function Simulacao() {
             }
           />
         </div>
-        <div className="grid grid-cols-2 items-end gap-3">
-          <CampoDinheiro
-            label="Assinatura dividida (total)"
-            value={estado.custos.assinaturaTotal}
-            onChange={(n) =>
-              alterar((r) => {
-                r.custos.assinaturaTotal = n ?? 0;
-              })
-            }
-          />
-          <CampoNumero
-            label="Dividido entre"
-            min={1}
-            max={99}
-            step={1}
-            valor={estado.custos.assinaturaPessoas}
-            aoMudar={(n) =>
-              alterar((r) => {
-                r.custos.assinaturaPessoas = Math.max(1, Math.round(n));
-              })
-            }
-          />
-        </div>
-        <CampoDinheiro
-          label="Outros (notebook, plano de saúde)"
-          value={estado.custos.outros}
-          onChange={(n) =>
-            alterar((r) => {
-              r.custos.outros = n ?? 0;
-            })
-          }
-        />
+        <p className="text-text-muted text-xs">
+          Taxas são o certificado digital, o alvará e a taxa da prefeitura, pela média do mês.
+        </p>
+        <OutrosGastos />
         <Leitura>
-          Total <strong className="text-text-primary">{brl(pj.fixosMes)}</strong> por mês, com{" "}
-          {brl(pj.assinaturaMes)} de assinatura por pessoa
+          Total <strong className="text-text-primary">{brl(pj.fixosMes)}</strong> por mês
+          {p.outros > 0 && `, com ${brl(p.outros)} de outros gastos`}
         </Leitura>
       </Grupo>
     </section>

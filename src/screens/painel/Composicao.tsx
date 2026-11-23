@@ -15,7 +15,7 @@ export function Composicao() {
     { nome: "Simples Nacional (DAS)", valor: pj.das, cor: "var(--cor-ouro)" },
     { nome: "INSS do sócio", valor: pj.inssAno, cor: "var(--cor-menta)" },
     { nome: "IR do pró-labore", valor: pj.irAno, cor: "var(--cor-lilas)" },
-    { nome: "Contador, taxas, assinatura e outros", valor: pj.fixosAno, cor: "var(--cor-ceu)" },
+    { nome: "Contador, taxas e outros gastos", valor: pj.fixosAno, cor: "var(--cor-ceu)" },
   ];
   const visiveis = partes.filter((x) => x.valor > 0.5);
 
