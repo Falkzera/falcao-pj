@@ -96,3 +96,45 @@ test("Número negativo ou absurdo no arquivo volta para o padrão", () => {
   assert.equal(e.hoje.salario, E.padrao().hoje.salario);
   assert.equal(e.contrato.teto.valor, 0);
 });
+
+test("Arquivo com valor acima do limite do campo volta para o padrão", () => {
+  // regressão: o limite era 1 bilhão para tudo, e R$ 99 sextilhões digitados num campo
+  // de custo deixavam a tela com números de 30 casas
+  const e = E.normalizar({
+    hoje: { salario: 2_000_000, dependentes: 500 },
+    contrato: { teto: { valor: 1_500_000 }, horasMes: { valor: 10_000 } },
+    custos: { contador: 5_000_000 },
+  });
+  const p = E.padrao();
+  assert.equal(e.hoje.salario, p.hoje.salario);
+  assert.equal(e.hoje.dependentes, p.hoje.dependentes);
+  assert.equal(e.contrato.teto.valor, 0);
+  assert.equal(e.contrato.horasMes.valor, p.contrato.horasMes.valor);
+  assert.equal(e.custos.contador, p.custos.contador);
+});
+
+test("Valor no limite do campo é aceito", () => {
+  const e = E.normalizar({
+    hoje: { salario: E.LIMITES.dinheiro, dependentes: E.LIMITES.dependentes },
+    contrato: { horasMes: { valor: 744 } },
+  });
+  assert.equal(e.hoje.salario, E.LIMITES.dinheiro);
+  assert.equal(e.hoje.dependentes, E.LIMITES.dependentes);
+  assert.equal(e.contrato.horasMes.valor, 744);
+});
+
+test("Todo item de número do contrato tem limite próprio", () => {
+  for (const c of E.CAMPOS.filter((x) => x.tipo === "numero"))
+    assert.ok(c.max !== undefined && c.max > 0, c.id);
+  const horas = E.CAMPOS.find((c) => c.id === "horasMes");
+  assert.ok(horas);
+  assert.equal(E.limiteDe(horas), 744);
+});
+
+test("Texto e anotação do contrato ficam com no máximo o limite de letras", () => {
+  const e = E.normalizar({
+    contrato: { reajuste: { valor: "b".repeat(5000), nota: "a".repeat(5000) } },
+  });
+  assert.equal(String(e.contrato.reajuste.valor).length, E.LIMITES.texto);
+  assert.equal(e.contrato.reajuste.nota.length, E.LIMITES.texto);
+});

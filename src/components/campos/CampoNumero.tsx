@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Input, type InputProps } from "../ui/Input";
 
-interface CampoNumeroProps extends Omit<InputProps, "value" | "onChange" | "type"> {
+interface CampoNumeroProps extends Omit<InputProps, "value" | "onChange" | "type" | "min" | "max"> {
   valor: number;
   aoMudar: (valor: number) => void;
+  min?: number;
+  /** Obrigatório: número sem teto deixava digitar o que quebrasse a tela. */
+  max: number;
 }
 
 /**
@@ -11,8 +14,17 @@ interface CampoNumeroProps extends Omit<InputProps, "value" | "onChange" | "type
  *
  * Guarda o texto digitado enquanto o campo está em foco: sem isso, apagar o
  * número para digitar outro voltava na hora para "0" e empurrava o cursor.
+ * O que passa do máximo vira o máximo, e abaixo do mínimo a conta usa o mínimo.
  */
-export function CampoNumero({ valor, aoMudar, onFocus, onBlur, ...resto }: CampoNumeroProps) {
+export function CampoNumero({
+  valor,
+  aoMudar,
+  min = 0,
+  max,
+  onFocus,
+  onBlur,
+  ...resto
+}: CampoNumeroProps) {
   const [texto, setTexto] = useState(String(valor));
   const [focado, setFocado] = useState(false);
 
@@ -25,6 +37,8 @@ export function CampoNumero({ valor, aoMudar, onFocus, onBlur, ...resto }: Campo
       {...resto}
       type="number"
       inputMode="decimal"
+      min={min}
+      max={max}
       value={texto}
       onFocus={(e) => {
         setFocado(true);
@@ -35,9 +49,14 @@ export function CampoNumero({ valor, aoMudar, onFocus, onBlur, ...resto }: Campo
         onBlur?.(e);
       }}
       onChange={(e) => {
-        setTexto(e.target.value);
         const n = Number.parseFloat(e.target.value);
-        aoMudar(Number.isFinite(n) ? n : 0);
+        if (n > max) {
+          setTexto(String(max));
+          aoMudar(max);
+          return;
+        }
+        setTexto(e.target.value);
+        aoMudar(Number.isFinite(n) ? Math.max(min, n) : min);
       }}
     />
   );

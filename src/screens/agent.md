@@ -18,6 +18,7 @@ As telas. Uma tela lê o estado por `useConsultor()` e as contas por `useResulta
 | `painel/Cenarios.tsx`, `Memoria.tsx` | Tabela de cenários e memória de cálculo |
 | `painel/AcoesDosDados.tsx` | Exportar, importar e voltar ao padrão |
 | `painel/*.test.ts` | Escala e cenários, aviso de teto, e o layout que segura o gráfico no lugar |
+| `limites.test.ts` | Toda tela usa o campo de dinheiro com limite, e todo texto do contrato tem limite de letras |
 | `contrato/ContratoScreen.tsx` | Itens do contrato com valor, situação e anotação, e a cópia das perguntas |
 | `regras/RegrasScreen.tsx` | Tabelas do ano em vigor, premissas e fontes |
 

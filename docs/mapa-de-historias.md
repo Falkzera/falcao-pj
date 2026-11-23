@@ -8,7 +8,7 @@ Decidir a proposta → negociar na reunião → abrir a empresa → acompanhar c
 
 | Onda | Histórias | Estado |
 |---|---|---|
-| 1 | 1.1 a 1.7 | Feita, no histórico inicial do repositório |
+| 1 | 1.1 a 1.8 | Feita, 1.1 a 1.7 no histórico inicial do repositório |
 | 2 | 2.1 a 2.4 | Próxima |
 | 3 | 3.1 e 3.2 | Depois da onda 2 |
 
@@ -127,4 +127,19 @@ Cenário: Escala que não trava
   Dado um teto de R$ 1 trilhão num arquivo importado
   Quando o painel desenha o gráfico
   Então a escala para em R$ 1 milhão por mês e tem no máximo umas dez marcas
+```
+
+### 1.8 Campos com limite
+Nenhum campo aceita um valor que quebre a tela. Dinheiro vai até R$ 1 milhão por mês, texto até 300 letras, e cada número do contrato tem o seu máximo (744 horas por mês, 252 dias de folga). O arquivo importado respeita os mesmos limites.
+
+```gherkin
+Cenário: Dígito além do limite
+  Dado um campo de dinheiro com R$ 1.000.000,00
+  Quando eu digito mais um número
+  Então o dígito é ignorado e o campo continua em R$ 1.000.000,00
+
+Cenário: Arquivo com valor fora do limite
+  Dado um arquivo importado com salário de R$ 2 milhões e uma anotação de 5 mil letras
+  Quando o sistema lê o arquivo
+  Então o salário volta para o padrão e a anotação fica com as primeiras 300 letras
 ```

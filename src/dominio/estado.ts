@@ -2,6 +2,7 @@
    Ficam no navegador (localStorage), saem e entram por arquivo JSON e podem partir
    de um arquivo local fora do git (dados/meus-dados.json). Sem React aqui. */
 import type { Parametros, RegraProLabore } from "./calculo.ts";
+import { REGRAS } from "./regras.ts";
 
 const CHAVE = "falcao-pj-v1";
 const VERSAO = 1;
@@ -16,6 +17,21 @@ export const SITUACOES: Record<Situacao, string> = {
 
 type TipoCampo = "dinheiro" | "numero" | "opcao" | "data" | "texto";
 
+/**
+ * O maior valor de cada tipo de campo. Acima disso o número é engano ou foi digitado
+ * para quebrar a tela, e a tela digitada e o arquivo importado respeitam os mesmos.
+ */
+export const LIMITES = {
+  /** Qualquer valor em dinheiro, por mês. */
+  dinheiro: 1_000_000,
+  /** Letras de um texto ou de uma anotação do contrato. */
+  texto: 300,
+  dependentes: 20,
+} as const;
+
+/** Dias úteis de um ano, o máximo de folga ou de feriados sem receber. */
+const DIAS_UTEIS_NO_ANO = REGRAS.diasUteisPorMes * 12;
+
 export interface CampoContrato {
   id: string;
   rotulo: string;
@@ -25,6 +41,8 @@ export interface CampoContrato {
   /** Muda o resultado do painel. */
   conta?: boolean;
   opcoes?: string[];
+  /** Maior valor de um item de número. Item de dinheiro usa `LIMITES.dinheiro`. */
+  max?: number;
 }
 
 /** Cada item que o contrato define. */
@@ -49,6 +67,7 @@ export const CAMPOS: CampoContrato[] = [
     rotulo: "Horas por mês",
     tipo: "numero",
     padrao: 160,
+    max: 744, // as horas de um mês de 31 dias
     conta: true,
     pergunta: "Quantas horas por mês o contrato prevê?",
   },
@@ -57,6 +76,7 @@ export const CAMPOS: CampoContrato[] = [
     rotulo: "Dias úteis de descanso sem receber",
     tipo: "numero",
     padrao: 21,
+    max: DIAS_UTEIS_NO_ANO,
     conta: true,
     pergunta: "Existe descanso remunerado no ano? Se não, quantos dias posso tirar sem receber?",
   },
@@ -65,6 +85,7 @@ export const CAMPOS: CampoContrato[] = [
     rotulo: "Feriados em dia útil sem receber",
     tipo: "numero",
     padrao: 12,
+    max: DIAS_UTEIS_NO_ANO,
     conta: true,
     pergunta: "Feriados, pontos facultativos e recesso são pagos?",
   },
@@ -81,6 +102,7 @@ export const CAMPOS: CampoContrato[] = [
     rotulo: "Dias até o pagamento depois da entrega",
     tipo: "numero",
     padrao: 30,
+    max: 365,
     pergunta: "Quantos dias depois da entrega do relatório ou produto o dinheiro cai?",
   },
   {
@@ -146,6 +168,11 @@ export const CAMPOS: CampoContrato[] = [
   },
 ];
 
+/** O maior valor que um item de dinheiro ou de número aceita. */
+export function limiteDe(c: CampoContrato): number {
+  return c.max ?? LIMITES.dinheiro;
+}
+
 export interface ItemContrato {
   valor: number | string;
   situacao: Situacao;
@@ -183,18 +210,27 @@ function base(): Estado {
 
 const ehObjeto = (v: unknown): v is Record<string, unknown> =>
   v !== null && typeof v === "object" && !Array.isArray(v);
-/** Nenhum valor do sistema passa disso; acima, o arquivo está errado ou foi feito para travar a tela. */
-const MAIOR_VALOR = 1e9;
-const numeroOu = (v: unknown, padrao: number) =>
-  typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= MAIOR_VALOR ? v : padrao;
+/** Número de arquivo fora de 0 a `maximo` volta para o padrão: o arquivo está errado ou foi feito para travar a tela. */
+const numeroOu = (v: unknown, padrao: number, maximo: number = LIMITES.dinheiro) =>
+  typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= maximo ? v : padrao;
+const textoOu = (v: unknown, padrao: string) =>
+  typeof v === "string" ? v.slice(0, LIMITES.texto) : padrao;
 
-/** Copia de `entrada` só o que existe no modelo e tem o tipo certo; o resto fica como está. */
-function mesclar<T extends object>(modelo: T, entrada: unknown): void {
+/**
+ * Copia de `entrada` só o que existe no modelo e tem o tipo certo; o resto fica como está.
+ * Número vai até `LIMITES.dinheiro`, ou até o limite dado para aquela chave.
+ */
+function mesclar<T extends object>(
+  modelo: T,
+  entrada: unknown,
+  limites: Partial<Record<keyof T, number>> = {},
+): void {
   if (!ehObjeto(entrada)) return;
   const alvo = modelo as Record<string, unknown>;
+  const maximos = limites as Record<string, number | undefined>;
   for (const [chave, padrao] of Object.entries(alvo)) {
     const v = entrada[chave];
-    if (typeof padrao === "number") alvo[chave] = numeroOu(v, padrao);
+    if (typeof padrao === "number") alvo[chave] = numeroOu(v, padrao, maximos[chave]);
     else if (typeof padrao === "boolean") alvo[chave] = typeof v === "boolean" ? v : padrao;
     else if (typeof padrao === "string") alvo[chave] = typeof v === "string" ? v : padrao;
   }
@@ -202,7 +238,7 @@ function mesclar<T extends object>(modelo: T, entrada: unknown): void {
 
 export function normalizar(entrada: unknown, modelo: Estado = base()): Estado {
   if (!ehObjeto(entrada)) throw new Error("O arquivo não tem os dados do consultor.");
-  mesclar(modelo.hoje, entrada.hoje);
+  mesclar(modelo.hoje, entrada.hoje, { dependentes: LIMITES.dependentes });
   mesclar(modelo.empresa, entrada.empresa);
   mesclar(modelo.custos, entrada.custos);
   if (!REGRAS_PRO_LABORE.includes(modelo.empresa.proLaboreRegra))
@@ -214,15 +250,15 @@ export function normalizar(entrada: unknown, modelo: Estado = base()): Estado {
     if (!ehObjeto(item)) continue;
     const alvo = modelo.contrato[c.id];
     if (c.tipo === "dinheiro" || c.tipo === "numero")
-      alvo.valor = numeroOu(item.valor, c.padrao as number);
+      alvo.valor = numeroOu(item.valor, c.padrao as number, limiteDe(c));
     else if (c.tipo === "opcao")
       alvo.valor = c.opcoes?.includes(item.valor as string) ? (item.valor as string) : c.padrao;
-    else alvo.valor = typeof item.valor === "string" ? item.valor : c.padrao;
+    else alvo.valor = textoOu(item.valor, c.padrao as string);
     alvo.situacao =
       typeof item.situacao === "string" && Object.hasOwn(SITUACOES, item.situacao)
         ? (item.situacao as Situacao)
         : "estimado";
-    alvo.nota = typeof item.nota === "string" ? item.nota : "";
+    alvo.nota = textoOu(item.nota, "");
   }
   return modelo;
 }
