@@ -4,6 +4,8 @@ Compara o que você recebe hoje, com carteira assinada ou em cargo comissionado,
 
 O projeto foi desenvolvido com o Claude Code como par de programação (detalhes em [Como foi feito](#como-foi-feito)).
 
+![Painel do Falcão PJ com os dados de exemplo](docs/tela.png)
+
 ## O que ele responde
 
 - **Quanto você ganha hoje, quanto ganharia como PJ e a diferença**, por ano e por mês, em reais e em porcentagem. O líquido como PJ já desconta o DAS, o INSS e o IR do pró-labore e os custos fixos; o de hoje inclui 13º, 1/3 de férias e FGTS.
@@ -61,6 +63,10 @@ Toda tabela fiscal mora em [`src/dominio/regras-2026.ts`](src/dominio/regras-202
 - Ficam fora da conta a abertura da empresa, o atraso do primeiro pagamento, os dias doente sem receber e a aposentadoria menor.
 
 É uma estimativa para decidir e negociar. Enquadramento e custos se confirmam com um contador.
+
+## Contribuir
+
+Contribuição é bem-vinda, do conserto de uma conta às tabelas de um ano novo. O caminho é fork, branch, `npm run verify` verde e pull request. O [CONTRIBUTING.md](CONTRIBUTING.md) explica como o código se organiza e o que o CI confere. Falha de segurança ou de privacidade vai pelo [SECURITY.md](SECURITY.md), não por issue.
 
 ## Como foi feito
 
