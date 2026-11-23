@@ -8,7 +8,7 @@ Decidir a proposta → negociar na reunião → abrir a empresa → acompanhar c
 
 | Onda | Histórias | Estado |
 |---|---|---|
-| 1 | 1.1 a 1.5 | Feita, no histórico inicial do repositório |
+| 1 | 1.1 a 1.6 | Feita, no histórico inicial do repositório |
 | 2 | 2.1 a 2.4 | Próxima |
 | 3 | 3.1 e 3.2 | Depois da onda 2 |
 
@@ -110,4 +110,7 @@ Cenário: Gráfico parado enquanto o controle desliza
   Quando eu arrasto o controle do valor bruto e um aviso aparece ou some
   Então o gráfico não muda de lugar na página, porque os avisos ficam abaixo dele
 ```
+
+### 1.6 Para onde vai o faturamento, por mês
+A tabela da composição do faturamento ganha a coluna por mês, a média dos 12 meses, ao lado da coluna por ano.
 

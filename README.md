@@ -13,7 +13,7 @@ O projeto foi desenvolvido com o Claude Code como par de programação (detalhes
 
 ## Telas
 
-- **Painel.** Líquido por ano de hoje e como PJ, bruto de empate, o gráfico do líquido por bruto mensal, para onde vai o faturamento, cenários e a memória de cálculo.
+- **Painel.** Líquido por ano de hoje e como PJ, bruto de empate, o gráfico do líquido por bruto mensal, para onde vai o faturamento (por mês e por ano), cenários e a memória de cálculo.
 - **Contrato.** Os itens que o contrato define, cada um com valor, situação e anotação.
 - **Regras de 2026.** As tabelas de INSS, IR e Simples que a conta usa, com as premissas e as fontes.
 

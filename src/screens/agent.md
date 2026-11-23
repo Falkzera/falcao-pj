@@ -14,7 +14,7 @@ As telas. Uma tela lê o estado por `useConsultor()` e as contas por `useResulta
 | `painel/GraficoLiquido.tsx` | Gráfico (Recharts, carregado sob demanda) do líquido anual por bruto mensal |
 | `painel/escala.ts` | Faixa do bruto, que o controle e o gráfico dividem, marcas redondas dos eixos e os brutos da tabela de cenários |
 | `painel/Avisos.tsx`, `regrasDeAviso.ts` | Avisos do painel; a regra de cada um é função pura |
-| `painel/Composicao.tsx` | Para onde vai o faturamento |
+| `painel/Composicao.tsx` | Para onde vai o faturamento, por mês e por ano |
 | `painel/Cenarios.tsx`, `Memoria.tsx` | Tabela de cenários e memória de cálculo |
 | `painel/AcoesDosDados.tsx` | Exportar, importar e voltar ao padrão |
 | `painel/*.test.ts` | Escala e cenários, aviso de teto, e o layout que segura o gráfico no lugar |
@@ -34,6 +34,7 @@ As telas. Uma tela lê o estado por `useConsultor()` e as contas por `useResulta
 - 2026-11-23. Eixo vertical do gráfico com escala própria (degraus de 10 mil em volta da curva e da linha de hoje). Começar em zero achatava a reta.
 - 2026-11-23. A faixa do bruto sai do salário de hoje e do teto (`escala.ts`), e não de valores fixos, para servir a qualquer salário. Ela não depende do bruto escolhido, senão andaria enquanto o controle desliza.
 - 2026-11-23. Os cenários partem do teto (ou da proposta, sem teto) e de 90% e 80% dele, a faixa em que se negocia.
+- 2026-11-23. A composição do faturamento mostra também o valor por mês, a média dos 12 meses.
 - 2026-11-23. A escala do gráfico tem teto (R$ 1 milhão por mês) e no máximo umas dez marcas por eixo. Um teto absurdo no arquivo importado gerava milhões de marcas, e acima de 1e22 o laço não terminava.
 
 ## Pendências conhecidas

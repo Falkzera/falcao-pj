@@ -22,7 +22,7 @@ export function Composicao() {
   return (
     <Cartao
       titulo="Para onde vai o faturamento"
-      descricao={`Faturamento anual de ${brl(pj.receita, 0)}: ${brl(pj.bruto, 0)} × ${numero(pj.meses)} meses pagos.`}
+      descricao={`Faturamento anual de ${brl(pj.receita, 0)}: ${brl(pj.bruto, 0)} × ${numero(pj.meses)} meses pagos. Por mês é a média dos 12 meses.`}
     >
       <div
         className="flex h-8 gap-[3px] overflow-hidden rounded-full border-2 border-[var(--marinho)]"
@@ -46,6 +46,9 @@ export function Composicao() {
                 Parte
               </th>
               <th scope="col" className="whitespace-nowrap py-2 pl-3 text-right font-bold">
+                Por mês
+              </th>
+              <th scope="col" className="whitespace-nowrap py-2 pl-3 text-right font-bold">
                 Por ano
               </th>
               <th scope="col" className="whitespace-nowrap py-2 pl-3 text-right font-bold">
@@ -65,6 +68,9 @@ export function Composicao() {
                   {x.nome}
                 </td>
                 <td className="tabular whitespace-nowrap py-2.5 pl-3 text-right font-semibold">
+                  {brl(x.valor / 12, 0)}
+                </td>
+                <td className="tabular whitespace-nowrap py-2.5 pl-3 text-right">
                   {brl(x.valor, 0)}
                 </td>
                 <td className="tabular whitespace-nowrap py-2.5 pl-3 text-right">
