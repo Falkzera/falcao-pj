@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Falcão PJ: tokens e peças.
+
+   A linguagem é a do Falcão Questões no tema claro: Barlow no corpo e Barlow
+   Condensed nos títulos e números grandes, tinta marinho, cartões brancos sobre
+   a Névoa, botão principal em pílula marinho e as peças no jeito do adesivo
+   (traço de 2 px e sombra dura, adesivo.css). Só existe o tema claro, por
+   decisão do dono. Todo par texto/fundo passa de 4,5:1 (os valores são os do
+   Questões, já medidos lá).
+   --------------------------------------------------------------------------- */
+@layer base {
+  :root {
+    color-scheme: light;
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+    --z-moldura: 30;
+    --z-gaveta: 40;
+    --z-dialogo: 50;
+    --z-flutuante: 60;
+    --z-aviso: 70;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+    --nav-barra: 64px;
+    --nav-folga: 24px;
+    --nav-altura: calc(var(--nav-folga) + var(--nav-barra) + var(--safe-bottom));
+
+    /* As cores da família (as dos cartões do Questões); texto sobre elas é sempre marinho. */
+    --marinho: #0b2d4c;
+    --cor-ouro: #f9b64f;
+    --cor-menta: #31e1c7;
+    --cor-lilas: #c7aff5;
+    --cor-ceu: #80c7f8;
+    --cor-ouro-miolo: #fff3d4;
+    --cor-ceu-miolo: #f3faff;
+    --cor-cinza: #9aa6b5;
+
+    /* Neutros da marca. Texto 14,1 / 6,8 / 5,7 sobre o branco do cartão. */
+    --bg-primary: #f4f5f7;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #e9ecee;
+    --bg-glass: rgba(255, 255, 255, 0.94);
+    --text-primary: #0b2d4c;
+    --text-secondary: #4a5d70;
+    --text-muted: #56697c;
+    --border-subtle: #e6e9ed;
+    --border-default: #cfd6dd;
+
+    /* O adesivo no claro: traço e lábio no mesmo cinza. */
+    --traco: #cfd6dd;
+    --labio: var(--traco);
+    --fundo-da-peca-vazada: transparent;
+    --borda-do-campo: var(--border-default);
+
+    /* A tinta (marinho) nos dados, no botão principal e na seleção. */
+    --tinta: #0b2d4c;
+    --on-tinta: #ffffff;
+    --botao-principal: var(--tinta);
+    --on-botao-principal: var(--on-tinta);
+    --sombra-do-botao-principal: color-mix(in srgb, var(--tinta) 42%, var(--bg-primary));
+    --selecao: var(--tinta);
+    --on-selecao: var(--on-tinta);
+    --sombra-da-selecao: color-mix(in srgb, var(--tinta) 42%, var(--bg-primary));
+
+    /* A barra de baixo: a do cartão, com o fio da borda. */
+    --nav-fundo: var(--bg-secondary);
+    --nav-borda: var(--border-default);
+    --on-nav: var(--text-secondary);
+
+    /* O acento do lf/ do logotipo: o Ouro queimado, 5,4:1 sobre a Névoa. */
+    --acento-da-marca: #8a5a00;
+    --accent-primary: #80c7f8;
+    --accent-solid: var(--tinta);
+    --accent-text: #0a5291;
+    --on-accent: var(--on-tinta);
+    --success: #1b6e45;
+    --warning: #8a5a00;
+    --danger: #b3332e;
+    --info: #0a5291;
+    --on-success: #ffffff;
+    --on-danger: #ffffff;
+    --shadow-sm: 0 1px 2px rgb(11 45 76 / 0.06);
+    --shadow-md: 0 10px 30px rgb(11 45 76 / 0.08);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+  body {
+    @apply bg-bg-primary font-sans text-text-primary antialiased;
+    margin: 0;
+    overflow-x: hidden;
+    touch-action: manipulation;
+  }
+  #root {
+    isolation: isolate;
+  }
+  ::selection {
+    background: var(--cor-ceu);
+    color: var(--marinho);
+  }
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 2px solid var(--tinta);
+    outline-offset: 3px;
+  }
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+@layer components {
+  /* Títulos e rótulos: Barlow Condensed. */
+  .display {
+    @apply font-display font-extrabold;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+  }
+  .titulo-secao {
+    @apply font-display text-[1.625rem] font-extrabold leading-none text-text-primary;
+  }
+  .rotulo {
+    @apply font-display text-[0.8125rem] font-bold uppercase tracking-[0.08em];
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* O cartão e as peças de um toque. O traço e a sombra dura vêm do adesivo.css. */
+  .cartao {
+    @apply relative rounded-[28px] bg-bg-secondary;
+  }
+  .chip {
+    @apply inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-border bg-bg-secondary px-4 text-[0.9375rem] font-semibold text-text-secondary transition-colors;
+  }
+  .chip-ativo-fundo {
+    @apply absolute -inset-px rounded-full;
+    background: var(--selecao);
+  }
+
+  /* Escolha única em segmentos (Segmentos.tsx). */
+  .segmentos {
+    @apply flex gap-1 rounded-full bg-bg-tertiary p-1;
+  }
+  .segmento {
+    @apply relative flex h-11 min-w-11 flex-1 items-center justify-center whitespace-nowrap rounded-full px-2 text-[0.9375rem] font-semibold text-text-secondary transition-colors;
+  }
+  .segmentos-compactos .segmento {
+    @apply flex-none px-3 text-[0.8125rem];
+  }
+  .segmento-ativo {
+    color: var(--on-selecao);
+  }
+
+  /* Selo pequeno de estado (estimado, confirmado, no contrato, veredito). */
+  .selo {
+    @apply inline-flex h-6 items-center gap-1 rounded-full px-2.5 text-xs font-bold;
+  }
+
+  /* A barra de navegação de baixo, no celular (NavInferior.tsx). */
+  .nav-barra {
+    @apply pointer-events-none fixed inset-x-0 bottom-0 z-moldura mx-auto flex w-full max-w-lg items-end overflow-hidden lg:hidden;
+    height: var(--nav-altura);
+    padding-left: var(--safe-left);
+    padding-right: var(--safe-right);
+  }
+  .nav-barra-lisa {
+    @apply absolute inset-x-0 bottom-0;
+    height: calc(var(--nav-barra) + var(--safe-bottom));
+    background: var(--nav-fundo);
+    border-top: 1px solid var(--nav-borda);
+  }
+  .nav-item {
+    @apply pointer-events-auto relative flex flex-1 flex-col items-center;
+    height: calc(var(--nav-barra) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    color: var(--on-nav);
+  }
+  .nav-recorte {
+    @apply absolute inset-y-0 left-1/2 z-0;
+    fill: var(--nav-fundo);
+    stroke: var(--nav-borda);
+    stroke-width: 1px;
+  }
+  .nav-circulo {
+    @apply absolute rounded-full;
+    background: var(--cor-ouro);
+  }
+  .nav-icone {
+    @apply relative z-10 grid w-full place-items-center transition-colors duration-200;
+    height: 26px;
+    margin-top: 10px;
+  }
+  .nav-icone-atual {
+    color: var(--marinho);
+  }
+  .nav-rotulo {
+    @apply relative z-10 text-[0.75rem] font-semibold leading-none;
+    margin-top: 4px;
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-rotulo-atual {
+    @apply font-bold;
+    color: var(--text-primary);
+    transform: translateY(5px);
+  }
+
+  /* O conteúdo deixa folga para a barra de baixo, que só existe no celular. */
+  .app-conteudo {
+    padding-bottom: calc(var(--nav-altura) + 16px);
+  }
+  @media (min-width: 1024px) {
+    .app-conteudo {
+      padding-bottom: 48px;
+    }
+  }
+}
+
+/* O logotipo: o símbolo oficial que vira lf/ no hover (identidade visual). */
+.logo-morph {
+  --abertura-acento: var(--acento-da-marca);
+}
+.logo-morph__barra {
+  transition: fill 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.logo-morph__barra.is-lf {
+  fill: var(--abertura-acento);
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-morph__barra {
+    transition: none;
+  }
+}

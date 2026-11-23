@@ -1,0 +1,44 @@
+/* O jeito do adesivo, o mesmo do Falcão Questões: o traço e a sombra dura das peças, que
+   afundam na própria sombra no toque (lib/afundar.ts marca `data-afundada`).
+   Importado pelo main.tsx DEPOIS do estilo.css e fora das camadas do Tailwind: vem depois dos
+   utilitários e ganha deles no empate, então o traço de 2 px vale também onde a peça pede
+   `border`. O `:where` deixa a especificidade a de uma classe. */
+
+:where(:root) :is(.cartao, .chip, .botao-adesivo) {
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--traco);
+  box-shadow: 4px 4px 0 var(--labio);
+  transition-property: color, background-color, border-color, opacity, translate, box-shadow;
+  transition-duration: 0.1s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:where(:root) .chip {
+  box-shadow: 3px 3px 0 var(--labio);
+}
+
+:where(:root) .botao-adesivo-contorno {
+  background-color: var(--fundo-da-peca-vazada);
+}
+
+:where(:root) .botao-adesivo-principal {
+  --sombra-da-peca: var(--sombra-do-botao-principal);
+  border-color: var(--botao-principal);
+  box-shadow: 4px 4px 0 var(--sombra-da-peca);
+}
+
+:where(:root) .botao-adesivo-apagar {
+  --sombra-da-peca: color-mix(in srgb, var(--danger) 42%, var(--bg-primary));
+  border-color: var(--danger);
+  box-shadow: 4px 4px 0 var(--sombra-da-peca);
+}
+
+/* O afundar: a peça desce na própria sombra, que encolhe. */
+:where(:root) :is(.cartao, .chip, .botao-adesivo)[data-afundada] {
+  translate: 3px 3px;
+  box-shadow: 1px 1px 0 var(--sombra-da-peca, var(--labio));
+}
+:where(:root) .chip[data-afundada] {
+  translate: 2px 2px;
+}
