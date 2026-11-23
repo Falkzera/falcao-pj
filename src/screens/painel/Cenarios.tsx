@@ -2,7 +2,7 @@ import { Cartao } from "../../components/Tela";
 import * as C from "../../dominio/calculo.ts";
 import { useResultado } from "../../estado/ConsultorContext";
 import { cn } from "../../lib/cn";
-import { brl, pct } from "../../lib/formato";
+import { brl, comSinal, pct } from "../../lib/formato";
 import { brutosDosCenarios } from "./escala.ts";
 
 const FORMAS = [
@@ -19,10 +19,10 @@ export function Cenarios() {
   return (
     <Cartao
       titulo="Cenários"
-      descricao={`Líquido por ano e diferença sobre hoje, ${p.teto > 0 ? "no teto" : "na proposta"} e em 90% e 80% ${p.teto > 0 ? "dele" : "dela"}. A célula marcada é a escolhida agora.`}
+      descricao={`Líquido por ano e a diferença sobre hoje, em reais e em porcentagem, ${p.teto > 0 ? "no teto" : "na proposta"} e em 90% e 80% ${p.teto > 0 ? "dele" : "dela"}. A célula marcada é a escolhida agora.`}
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[30rem] text-[0.9375rem]">
+        <table className="w-full min-w-[36rem] text-[0.9375rem]">
           <thead>
             <tr className="rotulo border-border border-b text-text-muted">
               <th scope="col" className="py-2 text-left font-bold">
@@ -65,7 +65,7 @@ export function Cenarios() {
                           d >= 0 ? "text-success" : "text-danger",
                         )}
                       >
-                        {pct(d)}
+                        {comSinal(liquido - hoje.total)} ({pct(d)})
                       </span>
                     </td>
                   );

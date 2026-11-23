@@ -14,7 +14,8 @@ import {
 import { Cartao } from "../../components/Tela";
 import * as C from "../../dominio/calculo.ts";
 import { useConsultor, useResultado } from "../../estado/ConsultorContext";
-import { brl, mil, pct } from "../../lib/formato";
+import { cn } from "../../lib/cn";
+import { brl, comSinal, mil, numero, pct } from "../../lib/formato";
 import { faixaDoBruto, marcasEntre } from "./escala.ts";
 
 const TEXTO_EIXO = {
@@ -26,13 +27,16 @@ const TEXTO_EIXO = {
 function Dica({ active, payload, alvo }: TooltipProps<number, string> & { alvo: number }) {
   const ponto = payload?.[0]?.payload as { bruto: number; pj: number } | undefined;
   if (!active || !ponto) return null;
+  const ganho = ponto.pj - alvo;
   return (
-    <div className="rounded-2xl border-2 border-[var(--traco)] bg-bg-secondary px-3 py-2 text-sm shadow-[3px_3px_0_var(--labio)]">
-      <p className="tabular font-bold text-text-primary">{brl(ponto.bruto, 0)} por mês</p>
-      <p className="text-text-secondary">
-        PJ: <span className="tabular">{brl(ponto.pj, 0)}</span> por ano
+    <div className="space-y-0.5 rounded-2xl border-2 border-[var(--traco)] bg-bg-secondary px-3 py-2 text-sm shadow-[3px_3px_0_var(--labio)]">
+      <p className="tabular font-bold text-text-primary">Bruto de {brl(ponto.bruto, 0)} por mês</p>
+      <p className="tabular text-text-secondary">
+        Líquido {brl(ponto.pj, 0)} por ano, {brl(ponto.pj / 12, 0)} por mês
       </p>
-      <p className="text-text-muted">{pct(ponto.pj / alvo - 1)} sobre hoje</p>
+      <p className={cn("tabular font-semibold", ganho >= 0 ? "text-success" : "text-danger")}>
+        {comSinal(ganho)} por ano, {comSinal(ganho / 12)} por mês ({pct(ponto.pj / alvo - 1)})
+      </p>
     </div>
   );
 }
@@ -94,6 +98,7 @@ export default function GraficoLiquido() {
     Math.ceil((Math.max(...valores) + 5000) / 10000) * 10000,
   ];
   const marcasY = marcasEntre(dominio[0], dominio[1], 6);
+  const ganho = pj.liquido - hoje.total;
 
   const escolher = (bruto: number) =>
     alterar((r) => {
@@ -102,10 +107,11 @@ export default function GraficoLiquido() {
 
   return (
     <Cartao
-      titulo="Líquido por ano conforme o bruto"
-      descricao="Passe o mouse para ver cada valor. Clique no gráfico para escolher o bruto mensal."
+      titulo="Líquido conforme o bruto mensal"
+      descricao="Embaixo, o bruto que você fatura por mês; do lado, o líquido que ele deixa no ano. Passe o mouse para ver por mês e a diferença, e clique para escolher o bruto."
     >
       <Legenda comTeto={p.teto > 0} />
+      <p className="rotulo -mb-2 text-text-muted">Líquido por ano</p>
       <div className="h-80 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart
@@ -123,7 +129,7 @@ export default function GraficoLiquido() {
               type="number"
               domain={[X0, X1]}
               ticks={faixa.marcas}
-              tickFormatter={(v: number) => `${v / 1000} mil`}
+              tickFormatter={(v: number) => `${numero(v / 1000, v % 1000 ? 1 : 0)} mil`}
               tick={TEXTO_EIXO}
               tickLine={false}
               axisLine={{ stroke: "var(--border-default)" }}
@@ -132,7 +138,7 @@ export default function GraficoLiquido() {
               domain={dominio}
               ticks={marcasY}
               allowDataOverflow
-              tickFormatter={(v: number) => `${Math.round(v / 1000)} mil`}
+              tickFormatter={(v: number) => `${numero(v / 1000, 0)} mil`}
               tick={TEXTO_EIXO}
               tickLine={false}
               axisLine={false}
@@ -156,7 +162,7 @@ export default function GraficoLiquido() {
               stroke="var(--text-secondary)"
               strokeDasharray="6 5"
               label={{
-                value: `Hoje ${mil(hoje.total)}`,
+                value: `Hoje ${mil(hoje.total)} por ano`,
                 position: "insideTopLeft",
                 fill: "var(--text-secondary)",
                 fontSize: 11,
@@ -180,7 +186,7 @@ export default function GraficoLiquido() {
                 stroke="var(--text-secondary)"
                 strokeWidth={2}
                 label={{
-                  value: `empate ${brl(empate, 0)}`,
+                  value: `empate: bruto de ${brl(empate, 0)} por mês`,
                   position: "bottom",
                   fill: "var(--text-secondary)",
                   fontSize: 11,
@@ -196,7 +202,7 @@ export default function GraficoLiquido() {
                 stroke="var(--marinho)"
                 strokeWidth={2.5}
                 label={{
-                  value: mil(pj.liquido),
+                  value: `${mil(pj.liquido)} por ano`,
                   position: "left",
                   fill: "var(--text-primary)",
                   fontSize: 13,
@@ -207,6 +213,36 @@ export default function GraficoLiquido() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      <p className="rotulo -mt-2 text-right text-text-muted">Bruto por mês</p>
+      <ul className="space-y-2 text-[0.9375rem] text-text-secondary">
+        <li className="flex gap-3">
+          <span
+            className="mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 border-[var(--marinho)] bg-[var(--cor-ouro)]"
+            aria-hidden
+          />
+          <span>
+            <strong className="text-text-primary">Escolhido:</strong> bruto de{" "}
+            {brl(p.brutoMensal, 0)} por mês deixa {brl(pj.liquido, 0)} por ano (
+            {brl(pj.liquido / 12, 0)} por mês),{" "}
+            <strong className={ganho >= 0 ? "text-success" : "text-danger"}>
+              {comSinal(ganho)} por ano e {comSinal(ganho / 12)} por mês ({pct(ganho / hoje.total)})
+            </strong>{" "}
+            sobre hoje.
+          </span>
+        </li>
+        <li className="flex gap-3">
+          <span
+            className="mt-1.5 h-3 w-3 shrink-0 rounded-full border-2 border-text-secondary bg-bg-secondary"
+            aria-hidden
+          />
+          <span>
+            <strong className="text-text-primary">Empate:</strong>{" "}
+            {empate === null
+              ? "nenhum bruto até R$ 60 mil por mês empata com hoje."
+              : `bruto de ${brl(empate, 0)} por mês deixa o mesmo líquido de hoje, ${brl(hoje.total, 0)} por ano (${brl(hoje.total / 12, 0)} por mês).`}
+          </span>
+        </li>
+      </ul>
     </Cartao>
   );
 }

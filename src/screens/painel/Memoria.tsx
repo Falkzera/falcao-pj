@@ -2,7 +2,7 @@ import { Cartao } from "../../components/Tela";
 import { REGRAS } from "../../dominio/regras.ts";
 import { useConsultor, useResultado } from "../../estado/ConsultorContext";
 import { cn } from "../../lib/cn";
-import { brl, mil, negativo, numero } from "../../lib/formato";
+import { brl, comSinal, mil, negativo, numero, pct } from "../../lib/formato";
 
 type Linha = { item: string; como?: string; valor: string; tipo?: "sub" | "total" | "grupo" };
 
@@ -126,6 +126,12 @@ export function Memoria() {
     },
     { item: "Líquido por ano", valor: brl(r.liquido), tipo: "total" },
     { item: "Média por mês", como: "líquido por ano ÷ 12", valor: brl(r.liquido / 12) },
+    {
+      item: "Diferença sobre hoje",
+      como: `${comSinal(r.liquido / 12 - h.total / 12, 2)} por mês, ${pct(h.total > 0 ? r.liquido / h.total - 1 : 0, 1)}`,
+      valor: comSinal(r.liquido - h.total, 2),
+      tipo: "total",
+    },
     { item: "Como o dinheiro chega até você", valor: "", tipo: "grupo" },
     {
       item: "Pró-labore líquido",

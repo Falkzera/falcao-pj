@@ -6,14 +6,14 @@ O projeto foi desenvolvido com o Claude Code como par de programação (detalhes
 
 ## O que ele responde
 
-- **Quanto sobra por ano como PJ**, depois do DAS, do INSS e do IR do pró-labore e dos custos fixos, contra o líquido de hoje com 13º, 1/3 de férias e FGTS.
+- **Quanto você ganha hoje, quanto ganharia como PJ e a diferença**, por ano e por mês, em reais e em porcentagem. O líquido como PJ já desconta o DAS, o INSS e o IR do pró-labore e os custos fixos; o de hoje inclui 13º, 1/3 de férias e FGTS.
 - **Qual bruto mensal empata** com o que você recebe hoje, e quanto vale a sua hora.
 - **Que pró-labore usar** para a empresa ficar no Anexo III pelo Fator R, e quanto custa cair no Anexo V.
 - **O que ainda falta confirmar no contrato.** Cada item é estimado, confirmado na reunião ou assinado, e o que ainda é estimativa vira uma lista de perguntas pronta para copiar.
 
 ## Telas
 
-- **Painel.** Líquido por ano de hoje e como PJ, bruto de empate, o gráfico do líquido por bruto mensal, para onde vai o faturamento (por mês e por ano), cenários e a memória de cálculo.
+- **Painel.** O placar (hoje, como PJ e a diferença), o bruto de empate, o gráfico do líquido por bruto mensal, para onde vai o faturamento (por mês e por ano), cenários e a memória de cálculo.
 - **Contrato.** Os itens que o contrato define, cada um com valor, situação e anotação.
 - **Regras de 2026.** As tabelas de INSS, IR e Simples que a conta usa, com as premissas e as fontes.
 

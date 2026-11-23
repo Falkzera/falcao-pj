@@ -8,7 +8,7 @@ Decidir a proposta → negociar na reunião → abrir a empresa → acompanhar c
 
 | Onda | Histórias | Estado |
 |---|---|---|
-| 1 | 1.1 a 1.6 | Feita, no histórico inicial do repositório |
+| 1 | 1.1 a 1.7 | Feita, no histórico inicial do repositório |
 | 2 | 2.1 a 2.4 | Próxima |
 | 3 | 3.1 e 3.2 | Depois da onda 2 |
 
@@ -114,3 +114,17 @@ Cenário: Gráfico parado enquanto o controle desliza
 ### 1.6 Para onde vai o faturamento, por mês
 A tabela da composição do faturamento ganha a coluna por mês, a média dos 12 meses, ao lado da coluna por ano.
 
+### 1.7 Quanto ganho hoje, quanto vou ganhar e a diferença
+No topo do painel, um placar com o líquido de hoje, o líquido como PJ e a diferença, por ano e por mês, e a diferença também em porcentagem. Gráfico, cenários e memória de cálculo mostram a diferença em reais ao lado da porcentagem.
+
+```gherkin
+Cenário: Diferença em reais com sinal
+  Dado uma diferença de R$ 25.013,40 sobre hoje
+  Quando ela aparece na tela
+  Então aparece como +R$ 25.013, e uma perda aparece como −R$ 1.234
+
+Cenário: Escala que não trava
+  Dado um teto de R$ 1 trilhão num arquivo importado
+  Quando o painel desenha o gráfico
+  Então a escala para em R$ 1 milhão por mês e tem no máximo umas dez marcas
+```
