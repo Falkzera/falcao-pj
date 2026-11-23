@@ -1,0 +1,18 @@
+{
+  "hoje": { "salario": 6000, "dependentes": 0, "recebe13Ferias": true, "temFgts": false },
+  "contrato": {
+    "brutoMensal": { "valor": 9000, "situacao": "estimado", "nota": "" },
+    "teto": { "valor": 0, "situacao": "estimado", "nota": "" },
+    "horasMes": { "valor": 160, "situacao": "estimado", "nota": "" },
+    "folgaDias": { "valor": 21, "situacao": "estimado", "nota": "" },
+    "feriadosDias": { "valor": 12, "situacao": "estimado", "nota": "" }
+  },
+  "empresa": { "proLaboreRegra": "fatorR", "proLaboreValor": 5000, "pessoasNoCnpj": 1 },
+  "custos": {
+    "contador": 300,
+    "taxas": 40,
+    "assinaturaTotal": 0,
+    "assinaturaPessoas": 1,
+    "outros": 0
+  }
+}
