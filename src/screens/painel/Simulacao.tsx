@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
+import { CampoDinheiro } from "../../components/campos/CampoDinheiro";
 import { CampoNumero } from "../../components/campos/CampoNumero";
 import { SeloSituacao } from "../../components/campos/SeloSituacao";
 import { Segmentos } from "../../components/Segmentos";
 import { Checkbox } from "../../components/ui/Checkbox";
-import { MoneyInput } from "../../components/ui/MoneyInput";
 import type { RegraProLabore } from "../../dominio/calculo.ts";
+import { CAMPOS, LIMITES, limiteDe } from "../../dominio/estado.ts";
 import { useConsultor, useResultado } from "../../estado/ConsultorContext";
 import { brl, numero } from "../../lib/formato";
 import { faixaDoBruto } from "./escala.ts";
@@ -33,6 +34,12 @@ const ATALHOS = [
   { value: "folga", label: "Com folga", folga: 21, feriados: 0 },
   { value: "folga-feriados", label: "+ feriados", folga: 21, feriados: 12 },
 ] as const;
+
+/** O maior valor de um item de número do contrato. */
+function limite(id: string): number {
+  const campo = CAMPOS.find((c) => c.id === id);
+  return campo ? limiteDe(campo) : LIMITES.dinheiro;
+}
 
 function Grupo({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
@@ -78,7 +85,7 @@ export function Simulacao() {
   return (
     <section className="cartao space-y-6 p-5 sm:p-6" aria-label="Simulação">
       <Grupo titulo="Hoje, no emprego">
-        <MoneyInput
+        <CampoDinheiro
           label="Salário bruto mensal"
           value={estado.hoje.salario}
           onChange={(n) =>
@@ -90,6 +97,7 @@ export function Simulacao() {
         <CampoNumero
           label="Dependentes no IR"
           min={0}
+          max={LIMITES.dependentes}
           step={1}
           valor={estado.hoje.dependentes}
           aoMudar={(n) =>
@@ -126,7 +134,7 @@ export function Simulacao() {
 
       <Grupo titulo="Proposta PJ">
         <div className="space-y-2">
-          <MoneyInput
+          <CampoDinheiro
             label={<Rotulo texto="Valor bruto mensal" campo="brutoMensal" />}
             value={p.brutoMensal}
             onChange={valorContrato("brutoMensal")}
@@ -151,6 +159,7 @@ export function Simulacao() {
         <CampoNumero
           label={<Rotulo texto="Horas por mês" campo="horasMes" />}
           min={1}
+          max={limite("horasMes")}
           step={1}
           valor={p.horasMes}
           aoMudar={(n) => valorContrato("horasMes")(n)}
@@ -178,6 +187,7 @@ export function Simulacao() {
           <CampoNumero
             label={<Rotulo texto="Folga (dias)" campo="folgaDias" />}
             min={0}
+            max={limite("folgaDias")}
             step={1}
             valor={p.folgaDias}
             aoMudar={(n) => valorContrato("folgaDias")(Math.max(0, n))}
@@ -185,6 +195,7 @@ export function Simulacao() {
           <CampoNumero
             label={<Rotulo texto="Feriados" campo="feriadosDias" />}
             min={0}
+            max={limite("feriadosDias")}
             step={1}
             valor={p.feriadosDias}
             aoMudar={(n) => valorContrato("feriadosDias")(Math.max(0, n))}
@@ -211,7 +222,7 @@ export function Simulacao() {
           <p className="text-text-muted text-xs">{regra.explica}.</p>
         </div>
         {estado.empresa.proLaboreRegra === "outro" && (
-          <MoneyInput
+          <CampoDinheiro
             label="Pró-labore mensal"
             value={estado.empresa.proLaboreValor}
             onChange={(n) =>
@@ -244,7 +255,7 @@ export function Simulacao() {
 
       <Grupo titulo="Custos por mês">
         <div className="grid grid-cols-2 items-end gap-3">
-          <MoneyInput
+          <CampoDinheiro
             label="Contador"
             value={estado.custos.contador}
             onChange={(n) =>
@@ -253,7 +264,7 @@ export function Simulacao() {
               })
             }
           />
-          <MoneyInput
+          <CampoDinheiro
             label="Certificado e taxas"
             value={estado.custos.taxas}
             onChange={(n) =>
@@ -264,7 +275,7 @@ export function Simulacao() {
           />
         </div>
         <div className="grid grid-cols-2 items-end gap-3">
-          <MoneyInput
+          <CampoDinheiro
             label="Assinatura dividida (total)"
             value={estado.custos.assinaturaTotal}
             onChange={(n) =>
@@ -276,6 +287,7 @@ export function Simulacao() {
           <CampoNumero
             label="Dividido entre"
             min={1}
+            max={99}
             step={1}
             valor={estado.custos.assinaturaPessoas}
             aoMudar={(n) =>
@@ -285,7 +297,7 @@ export function Simulacao() {
             }
           />
         </div>
-        <MoneyInput
+        <CampoDinheiro
           label="Outros (notebook, plano de saúde)"
           value={estado.custos.outros}
           onChange={(n) =>

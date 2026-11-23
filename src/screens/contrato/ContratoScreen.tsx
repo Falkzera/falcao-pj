@@ -1,16 +1,18 @@
 import { ClipboardText } from "@phosphor-icons/react";
 import { useState } from "react";
 import { BotaoAdesivo } from "../../components/BotaoAdesivo";
+import { CampoDinheiro } from "../../components/campos/CampoDinheiro";
 import { CampoNumero } from "../../components/campos/CampoNumero";
 import { Segmentos } from "../../components/Segmentos";
 import { Selo } from "../../components/Selo";
 import { Tela } from "../../components/Tela";
 import { Input } from "../../components/ui/Input";
-import { MoneyInput } from "../../components/ui/MoneyInput";
 import { Textarea } from "../../components/ui/Textarea";
 import {
   CAMPOS,
   type CampoContrato,
+  LIMITES,
+  limiteDe,
   pendentes,
   type Situacao,
   textoPerguntas,
@@ -34,12 +36,19 @@ function Controle({ campo }: { campo: CampoContrato }) {
 
   if (campo.tipo === "dinheiro") {
     return (
-      <MoneyInput aria-label={rotulo} value={Number(valor)} onChange={(n) => definir(n ?? 0)} />
+      <CampoDinheiro aria-label={rotulo} value={Number(valor)} onChange={(n) => definir(n ?? 0)} />
     );
   }
   if (campo.tipo === "numero") {
     return (
-      <CampoNumero aria-label={rotulo} min={0} step={1} valor={Number(valor)} aoMudar={definir} />
+      <CampoNumero
+        aria-label={rotulo}
+        min={0}
+        max={limiteDe(campo)}
+        step={1}
+        valor={Number(valor)}
+        aoMudar={definir}
+      />
     );
   }
   if (campo.tipo === "opcao") {
@@ -59,6 +68,7 @@ function Controle({ campo }: { campo: CampoContrato }) {
       aria-label={rotulo}
       type={campo.tipo === "data" ? "date" : "text"}
       placeholder={campo.tipo === "texto" ? "O que foi dito" : undefined}
+      maxLength={LIMITES.texto}
       value={String(valor)}
       onChange={(e) => definir(e.target.value)}
     />
@@ -83,6 +93,7 @@ function Item({ campo }: { campo: CampoContrato }) {
           <Input
             aria-label={`Anotação: ${campo.rotulo}`}
             placeholder="Anotação"
+            maxLength={LIMITES.texto}
             value={item.nota}
             onChange={(e) =>
               alterar((r) => {

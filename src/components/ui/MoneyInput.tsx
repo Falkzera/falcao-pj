@@ -12,6 +12,7 @@ import {
 import { cn } from "../../lib/cn";
 import { Field } from "./Field";
 import { fieldShellState } from "./fieldChrome";
+import { formatCentsBRL, nextCents, parsePasteToReais, withinMax } from "./moneyMask";
 
 // ---------------------------------------------------------------------------
 // MoneyInput (BRL): canonical Falcao System Design primitive
@@ -35,7 +36,8 @@ import { fieldShellState } from "./fieldChrome";
 //   2. Strip ALL non-digits (we're treating the whole string as
 //      digit-only; commas/periods/letters/spaces are ignored noise).
 //   3. Parse the remaining digit string as an integer, that's the new
-//      `cents` value. Empty string → `null`.
+//      `cents` value. Empty string → `null`. Acima do `max`, a tecla e
+//      ignorada e o valor fica como estava (`nextCents` em moneyMask.ts).
 //   4. `setCents()` + `onChange?.(cents / 100)`.
 //   5. Next render: `value` prop on the input is the re-formatted string.
 //   6. `useLayoutEffect` forces the caret to the END of the input so
@@ -136,55 +138,14 @@ export interface MoneyInputProps {
   controlClassName?: string;
   /** Disable the whole control. */
   disabled?: boolean;
+  /**
+   * Maior valor aceito, em REAIS. O digito que passaria dele e ignorado, como
+   * nos apps de banco, e a colagem acima dele tambem.
+   */
+  max?: number;
   className?: string;
   /** `aria-label` on the input. */
   "aria-label"?: string;
-}
-
-// ---------------------------------------------------------------------------
-// Pure helpers: intentionally NOT imported from lib/format so this file
-// is self-contained. `lib/format.formatBRL` uses Intl.NumberFormat which
-// gives "R$ 1.234,56" with a non-breaking space between "R$" and the
-// number: a mask needs a plain ASCII space so keystrokes count the way
-// the user expects.
-// ---------------------------------------------------------------------------
-
-function formatCentsBRL(cents: number): string {
-  // Clamp negative to zero (v1 is unsigned) and handle the formatting
-  // by hand to get a regular ASCII space after "R$".
-  const safe = Math.max(0, Math.floor(cents));
-  const reais = Math.floor(safe / 100);
-  const centavos = safe % 100;
-  const reaisStr = reais.toLocaleString("pt-BR");
-  return `R$ ${reaisStr},${centavos.toString().padStart(2, "0")}`;
-}
-
-/**
- * Paste parser: returns the pasted value as REAIS (float), or null if
- * the clipboard content has no parseable numeric content at all. See the
- * test table in the file header for the expected behavior.
- */
-function parsePasteToReais(raw: string): number | null {
-  // Keep only digits, commas, and periods. Drop everything else
-  // (currency symbols, letters, spaces, thin spaces, etc.).
-  const cleaned = raw.replace(/[^\d.,]/g, "");
-  if (!cleaned) return null;
-
-  // Does the string end with a separator followed by 1-2 digits?
-  // That trailing group is the decimal part.
-  const decimalMatch = cleaned.match(/[.,](\d{1,2})$/);
-  if (decimalMatch) {
-    const decPart = decimalMatch[1].padEnd(2, "0");
-    const intPart = cleaned.slice(0, cleaned.length - decimalMatch[0].length).replace(/[.,]/g, "");
-    const n = Number.parseFloat(`${intPart || "0"}.${decPart}`);
-    return Number.isFinite(n) ? n : null;
-  }
-
-  // No decimal separator: everything is integer reais. Strip any
-  // thousand separators that may still be lying around.
-  const intOnly = cleaned.replace(/[.,]/g, "");
-  const n = Number.parseInt(intOnly, 10);
-  return Number.isFinite(n) ? n : null;
 }
 
 export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function MoneyInput(
@@ -200,6 +161,7 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function
     valido,
     label,
     disabled,
+    max,
     className,
     controlClassName,
     "aria-label": ariaLabel,
@@ -245,16 +207,10 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const digits = e.target.value.replace(/\D/g, "");
-    if (digits === "") {
-      commitCents(null);
-      return;
-    }
-    // Parse as integer cents. `parseInt` handles arbitrary-length digit
-    // strings gracefully; JS numbers safely fit integers up to 2^53-1
-    // (~90 trillion reais in cents), far beyond any realistic value.
-    const parsed = Number.parseInt(digits, 10);
-    commitCents(Number.isFinite(parsed) ? parsed : null);
+    const next = nextCents(e.target.value, cents, max);
+    // Igual ao atual (digito alem do limite): nao muda nada, e o React devolve
+    // ao campo o texto formatado que ja estava.
+    if (next !== cents) commitCents(next);
   };
 
   const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
@@ -262,7 +218,8 @@ export const MoneyInput = forwardRef<HTMLInputElement, MoneyInputProps>(function
     const reais = parsePasteToReais(pasted);
     if (reais == null) return; // fall through to default paste (then handleChange)
     e.preventDefault();
-    commitCents(Math.round(reais * 100));
+    const next = Math.round(reais * 100);
+    if (withinMax(next, max)) commitCents(next);
   };
 
   const setRef = (node: HTMLInputElement | null) => {
