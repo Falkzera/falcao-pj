@@ -1,0 +1,33 @@
+# src/dominio
+
+## Propósito
+
+As regras fiscais e as contas. Não conhece React nem a tela, e roda no Node para os testes. Nada fora daqui decide valor de imposto. Esta pasta não importa de nenhuma outra.
+
+## Arquivos
+
+| Arquivo | Responde por |
+|---|---|
+| `regras.ts` | O ano em vigor. O resto do sistema importa daqui |
+| `regras-2026.ts` | Tabelas de 2026: INSS, IR com o desconto da Lei 15.270, Simples (Anexos III e V), Fator R, salário mínimo, limites do MEI e dos dividendos |
+| `calculo.ts` | Situação de hoje (salário, 13º, 1/3 de férias, FGTS), meses pagos, pró-labore, empresa no Simples e o bruto de empate |
+| `calculo.test.ts` | INSS, IR, hoje, meses pagos, Fator R e anexos, faixa com vários sócios, empate |
+
+## Padrões
+
+- Imports entre estes arquivos levam a extensão `.ts`, porque o Node roda os testes direto do TypeScript.
+- O valor esperado de um teste é feito à mão a partir da tabela publicada, com a conta no comentário, e usa valores fictícios (salário de R$ 6.000).
+- Ano novo é arquivo novo (`regras-AAAA.ts`, no mesmo formato) e uma linha trocada em `regras.ts`.
+
+## Decisões recentes
+
+- 2026-11-23. INSS e IR arredondados em centavos. Sem isso, renda de exatamente R$ 5 mil deixava um resíduo de imposto e o pró-labore do Fator R subia um centavo.
+- 2026-11-23. O INSS corta cada faixa nos centavos antes de somar. Arredondar o total dava 2 centavos a mais que um contracheque real, e o IR, um centavo a menos.
+- 2026-11-23. Meses pagos = 12 − (dias de folga + feriados) ÷ 21. O pró-labore e os custos fixos continuam nos 12 meses.
+- 2026-11-23. O custo dividido entre sócios se chama assinatura (`assinaturaTotal` e `assinaturaPessoas`), sem nome de produto.
+
+## Pendências conhecidas
+
+- O cálculo usa o faturamento anual como RBT12. O acompanhamento mês a mês (onda 2) precisa da receita e da folha dos 12 meses anteriores de verdade, com a regra de início de atividade.
+- O 13º assume que o desconto da Lei 15.270 também vale para ele.
+- A situação de hoje só conhece o INSS do regime geral.

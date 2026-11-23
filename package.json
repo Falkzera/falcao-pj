@@ -1,0 +1,44 @@
+{
+  "name": "falcao-pj",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Compara o que você recebe hoje com o que sobraria como PJ no Simples Nacional, e guarda o que o contrato define.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --test --experimental-strip-types \"src/**/*.test.ts\"",
+    "check": "biome check .",
+    "verify": "npm run check && tsc -b --noEmit && npm run test"
+  },
+  "dependencies": {
+    "@fontsource/barlow": "^5.3.0",
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.18.2",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.18.6",
+    "recharts": "^2.15.4",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.11",
+    "@types/node": "^26.2.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^3.4.19",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.4"
+  },
+  "overrides": {
+    "csstype": "3.2.3"
+  }
+}

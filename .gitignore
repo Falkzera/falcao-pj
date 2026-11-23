@@ -1,0 +1,10 @@
+# dados pessoais: só o exemplo entra no git
+dados/*
+!dados/exemplo.json
+
+# arquivos exportados pelo sistema
+falcao-pj-dados-*.json
+
+node_modules/
+dist/
+.DS_Store
