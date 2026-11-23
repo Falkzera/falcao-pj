@@ -8,7 +8,7 @@ Decidir a proposta → negociar na reunião → abrir a empresa → acompanhar c
 
 | Onda | Histórias | Estado |
 |---|---|---|
-| 1 | 1.1 a 1.8 | Feita, 1.1 a 1.7 no histórico inicial do repositório |
+| 1 | 1.1 a 1.9 | Feita, 1.1 a 1.7 no histórico inicial do repositório |
 | 2 | 2.1 a 2.4 | Próxima |
 | 3 | 3.1 e 3.2 | Depois da onda 2 |
 
@@ -142,4 +142,19 @@ Cenário: Arquivo com valor fora do limite
   Dado um arquivo importado com salário de R$ 2 milhões e uma anotação de 5 mil letras
   Quando o sistema lê o arquivo
   Então o salário volta para o padrão e a anotação fica com as primeiras 300 letras
+```
+
+### 1.9 Outros gastos em lista
+Os custos do mês são o contador e as taxas, que toda empresa tem, e uma lista de outros gastos. "Adicionar gasto" abre os tipos (assinatura, plano de saúde, equipamento, internet e celular, coworking, despachante, seguro, previdência privada, outro), e cada um entra com o valor que cabe à pessoa.
+
+```gherkin
+Cenário: Adicionar uma assinatura
+  Dado os custos com contador e taxas
+  Quando eu adiciono um gasto do tipo assinatura com R$ 270 por mês
+  Então o custo do mês soma R$ 270 e a memória de cálculo mostra os outros gastos
+
+Cenário: Arquivo no formato antigo
+  Dado um arquivo com uma assinatura de R$ 1.100 dividida entre 4 pessoas
+  Quando o sistema lê o arquivo
+  Então os outros gastos têm uma assinatura de R$ 275 por mês
 ```

@@ -13,7 +13,7 @@ As regras fiscais, as contas e o formato dos dados. Não conhece React nem a tel
 | `calculo.ts` | Situação de hoje (salário, 13º, 1/3 de férias, FGTS), meses pagos, pró-labore, empresa no Simples e o bruto de empate |
 | `estado.ts` | Formato dos dados, itens do contrato com pergunta e situação, limites de cada campo (`LIMITES`, `limiteDe`), validação na importação, perguntas pendentes |
 | `calculo.test.ts` | INSS, IR, hoje, meses pagos, Fator R e anexos, faixa com vários sócios, empate |
-| `estado.test.ts` | Estado padrão, importação de arquivo estranho, tipos errados, limites, parâmetros da conta, perguntas pendentes |
+| `estado.test.ts` | Estado padrão, importação de arquivo estranho, tipos errados, limites, outros gastos e o formato antigo, parâmetros da conta, perguntas pendentes |
 | `exemplo.test.ts` | O `dados/exemplo.json` do repositório continua no formato dos dados |
 
 ## Padrões
@@ -31,7 +31,7 @@ As regras fiscais, as contas e o formato dos dados. Não conhece React nem a tel
 - 2026-11-23. O INSS corta cada faixa nos centavos antes de somar. Arredondar o total dava 2 centavos a mais que um contracheque real, e o IR, um centavo a menos.
 - 2026-11-23. Meses pagos = 12 − (dias de folga + feriados) ÷ 21. O pró-labore e os custos fixos continuam nos 12 meses.
 - 2026-11-23. O teto do contratante virou item do contrato (zero quer dizer sem teto), em vez de número fixo nas regras: ele é do contrato de cada pessoa, não da lei.
-- 2026-11-23. O custo dividido entre sócios se chama assinatura (`assinaturaTotal` e `assinaturaPessoas`), sem nome de produto.
+- 2026-11-23. Os custos são o contador e as taxas, que toda empresa tem, e uma lista de outros gastos por tipo (`TIPOS_DE_GASTO`), cada um com o valor que cabe à pessoa. A assinatura dividida entre pessoas saiu: servia a um caso só. O arquivo no formato antigo vira lista na leitura (`lerGastos`).
 - 2026-11-23. A situação só aceita as chaves próprias de `SITUACOES` (`Object.hasOwn`). Um `"__proto__"` passava pelo `in`.
 - 2026-11-23. Cada campo tem limite (`LIMITES`): R$ 1 milhão por mês para dinheiro, 300 letras para texto, 20 dependentes, e o `max` de cada item de número do contrato. O limite de 1 bilhão para tudo deixava digitar R$ 99 sextilhões num custo, e um teto de 1e308 travava a tela.
 

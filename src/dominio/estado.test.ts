@@ -138,3 +138,49 @@ test("Texto e anotação do contrato ficam com no máximo o limite de letras", (
   assert.equal(String(e.contrato.reajuste.valor).length, E.LIMITES.texto);
   assert.equal(e.contrato.reajuste.nota.length, E.LIMITES.texto);
 });
+
+test("Outros gastos entram numa lista por tipo e somam no custo do mês", () => {
+  const e = E.normalizar({
+    custos: {
+      gastos: [
+        { tipo: "assinatura", valor: 270 },
+        { tipo: "saude", valor: 400 },
+      ],
+    },
+  });
+  assert.deepEqual(
+    e.custos.gastos.map((g) => g.tipo),
+    ["assinatura", "saude"],
+  );
+  const p = E.parametros(e);
+  assert.equal(p.outros, 670);
+  assert.equal(p.contador, E.padrao().custos.contador);
+});
+
+test("Arquivo no formato antigo vira lista de gastos, com a assinatura já dividida", () => {
+  // o arquivo de antes guardava a assinatura inteira e quantas pessoas a dividiam
+  const e = E.normalizar({
+    custos: { contador: 300, assinaturaTotal: 1100, assinaturaPessoas: 4, outros: 150 },
+  });
+  assert.deepEqual(e.custos.gastos, [
+    { tipo: "assinatura", valor: 275 },
+    { tipo: "outro", valor: 150 },
+  ]);
+  assert.equal("assinaturaTotal" in e.custos, false);
+});
+
+test("Gasto de tipo desconhecido vira outro, valor fora do limite vira zero e a lista tem teto", () => {
+  const e = E.normalizar({
+    custos: {
+      gastos: [
+        { tipo: "__proto__", valor: 10 },
+        { tipo: "assinatura", valor: 5_000_000 },
+        "lixo",
+        ...Array.from({ length: 50 }, () => ({ tipo: "seguro", valor: 1 })),
+      ],
+    },
+  });
+  assert.equal(e.custos.gastos[0].tipo, "outro");
+  assert.equal(e.custos.gastos[1].valor, 0);
+  assert.equal(e.custos.gastos.length, E.LIMITES.gastos);
+});

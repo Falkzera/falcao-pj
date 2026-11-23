@@ -11,6 +11,7 @@ As telas. Uma tela lê o estado por `useConsultor()` e as contas por `useResulta
 | `painel/PainelScreen.tsx` | Monta o painel: resumo, simulação à esquerda, gráfico e avisos à direita, memória embaixo |
 | `painel/Resumo.tsx` | Veredito, o placar (hoje, como PJ e a diferença, por ano e por mês) e o bruto que empata |
 | `painel/Simulacao.tsx` | Campos da situação de hoje, da proposta, da empresa e dos custos |
+| `painel/OutrosGastos.tsx` | A lista de outros gastos: adicionar por tipo, valor do mês e remover |
 | `painel/GraficoLiquido.tsx` | Gráfico (Recharts, carregado sob demanda) do líquido anual por bruto mensal, com a leitura do ponto escolhido e do empate |
 | `painel/escala.ts` | Faixa do bruto, que o controle e o gráfico dividem, marcas redondas dos eixos e os brutos da tabela de cenários |
 | `painel/Avisos.tsx`, `regrasDeAviso.ts` | Avisos do painel; a regra de cada um é função pura |
@@ -39,6 +40,8 @@ As telas. Uma tela lê o estado por `useConsultor()` e as contas por `useResulta
 - 2026-11-23. Toda diferença sobre hoje sai em reais e em porcentagem, por ano e por mês (placar, gráfico, cenários, memória). Só a porcentagem não dizia quanto entra no bolso.
 - 2026-11-23. O gráfico diz o que cada eixo mede (bruto por mês embaixo, líquido por ano do lado) e lê, abaixo da curva, o ponto escolhido e o empate. O empate é um bruto mensal num gráfico de líquido anual, e sem a leitura parecia um ganho por mês.
 - 2026-11-23. A escala do gráfico tem teto (R$ 1 milhão por mês) e no máximo umas dez marcas por eixo. Um teto absurdo no arquivo importado gerava milhões de marcas, e acima de 1e22 o laço não terminava.
+
+- 2026-11-23. Os tipos de gasto abrem abaixo do botão, no fluxo da página, e não num menu flutuante. Ao escolher, o foco vai para o valor novo; ao remover, volta para o botão; Esc fecha os tipos.
 
 ## Pendências conhecidas
 

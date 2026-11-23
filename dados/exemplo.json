@@ -11,8 +11,6 @@
   "custos": {
     "contador": 300,
     "taxas": 40,
-    "assinaturaTotal": 0,
-    "assinaturaPessoas": 1,
-    "outros": 0
+    "gastos": [{ "tipo": "assinatura", "valor": 100 }]
   }
 }

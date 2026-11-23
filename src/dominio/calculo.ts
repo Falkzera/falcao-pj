@@ -20,8 +20,7 @@ export interface Parametros {
   pessoasNoCnpj: number;
   contador: number;
   taxas: number;
-  assinaturaTotal: number;
-  assinaturaPessoas: number;
+  /** Soma dos outros gastos do mês (assinatura, plano de saúde, equipamento...). */
   outros: number;
 }
 
@@ -151,7 +150,6 @@ export interface ResultadoPj {
   inssAno: number;
   irMes: number;
   irAno: number;
-  assinaturaMes: number;
   fixosMes: number;
   fixosAno: number;
   lucro: number;
@@ -170,8 +168,7 @@ export function pj(p: Parametros, bruto: number): ResultadoPj {
   const das = aliquota * receita;
   const inssMes = centavos(R.inss.aliquotaSocio * Math.min(pl, R.inss.teto));
   const irMes = irMensal(pl, inssMes, p.dependentes).ir;
-  const assinaturaMes = p.assinaturaTotal / Math.max(1, p.assinaturaPessoas);
-  const fixosMes = p.contador + p.taxas + assinaturaMes + p.outros;
+  const fixosMes = p.contador + p.taxas + p.outros;
   const inssAno = inssMes * 12;
   const irAno = irMes * 12;
   const fixosAno = fixosMes * 12;
@@ -191,7 +188,6 @@ export function pj(p: Parametros, bruto: number): ResultadoPj {
     inssAno,
     irMes,
     irAno,
-    assinaturaMes,
     fixosMes,
     fixosAno,
     lucro,

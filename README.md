@@ -8,7 +8,7 @@ O projeto foi desenvolvido com o Claude Code como par de programação (detalhes
 
 ## O que ele responde
 
-- **Quanto você ganha hoje, quanto ganharia como PJ e a diferença**, por ano e por mês, em reais e em porcentagem. O líquido como PJ já desconta o DAS, o INSS e o IR do pró-labore e os custos fixos; o de hoje inclui 13º, 1/3 de férias e FGTS.
+- **Quanto você ganha hoje, quanto ganharia como PJ e a diferença**, por ano e por mês, em reais e em porcentagem. O líquido como PJ já desconta o DAS, o INSS e o IR do pró-labore e os custos do mês; o de hoje inclui 13º, 1/3 de férias e FGTS.
 - **Qual bruto mensal empata** com o que você recebe hoje, e quanto vale a sua hora.
 - **Que pró-labore usar** para a empresa ficar no Anexo III pelo Fator R, e quanto custa cair no Anexo V.
 - **O que ainda falta confirmar no contrato.** Cada item é estimado, confirmado na reunião ou assinado, e o que ainda é estimativa vira uma lista de perguntas pronta para copiar.
@@ -51,7 +51,7 @@ cp dados/exemplo.json dados/meus-dados.json
 
 **Hoje.** Salário menos o INSS progressivo e o IR do mês, pela opção mais barata entre as deduções legais e o desconto simplificado, já com a redução da Lei 15.270/2025. Somam-se o 13º, o 1/3 de férias e o FGTS, quando existem.
 
-**Como PJ.** O faturamento do ano é o bruto mensal vezes os meses pagos, que são 12 menos os dias sem receber (descanso e feriados) divididos por 21 dias úteis. Dele saem o DAS do Simples, o INSS de 11% e o IR do pró-labore, e os custos fixos (contador, taxas, assinaturas). O pró-labore pode seguir o Fator R (28% do faturamento, o mínimo para o Anexo III), ficar em R$ 5 mil, no salário mínimo ou num valor livre.
+**Como PJ.** O faturamento do ano é o bruto mensal vezes os meses pagos, que são 12 menos os dias sem receber (descanso e feriados) divididos por 21 dias úteis. Dele saem o DAS do Simples, o INSS de 11% e o IR do pró-labore, e os custos do mês: o contador e as taxas, que toda empresa tem, e os outros gastos que você listar (assinatura, plano de saúde, equipamento). O pró-labore pode seguir o Fator R (28% do faturamento, o mínimo para o Anexo III), ficar em R$ 5 mil, no salário mínimo ou num valor livre.
 
 Toda tabela fiscal mora em [`src/dominio/regras-2026.ts`](src/dominio/regras-2026.ts), e a tela de Regras mostra cada uma. Cada conta tem teste com o valor esperado calculado à mão a partir da tabela publicada, com a conta escrita no comentário.
 

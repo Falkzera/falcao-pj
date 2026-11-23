@@ -143,7 +143,7 @@ export default function RegrasScreen() {
             </li>
             <li>
               Meses pagos = 12 menos (dias de folga + feriados) ÷ {R.diasUteisPorMes} dias úteis por
-              mês. Os custos fixos e o pró-labore continuam nos 12 meses.
+              mês. Os custos do mês e o pró-labore continuam nos 12 meses.
             </li>
             <li>
               Fora da conta: abertura da empresa, atraso do primeiro pagamento, dias doente sem

@@ -22,9 +22,7 @@ const BASE: C.Parametros = {
   pessoasNoCnpj: 1,
   contador: 300,
   taxas: 40,
-  assinaturaTotal: 600,
-  assinaturaPessoas: 3,
-  outros: 0,
+  outros: 200,
 };
 
 test("INSS de um salário de R$ 6.000 pela tabela progressiva de 2026 dá R$ 641,50", () => {
@@ -115,7 +113,7 @@ test("Com o pró-labore no mínimo do Fator R, a empresa fica no Anexo III com 6
 test("Líquido PJ é o faturamento menos DAS, INSS, IR e custos fixos", () => {
   // faturamento 10.500 × (12 − 33/21) = 109.500; DAS 6% = 6.570
   // pró-labore 28% × 109.500 ÷ 12 = 2.555 → INSS 11% × 2.555 × 12 = 3.372,60; IR zero
-  // custos (300 + 40 + 600 ÷ 3) × 12 = 6.480
+  // custos (300 contador + 40 taxas + 200 de outros gastos) × 12 = 6.480
   // líquido 109.500 − 6.570 − 3.372,60 − 6.480 = 93.077,40
   const r = C.pj(BASE, 10500);
   perto(r.receita, 109500);

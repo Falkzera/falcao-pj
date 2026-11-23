@@ -5,7 +5,7 @@ import type { Parametros, RegraProLabore } from "./calculo.ts";
 import { REGRAS } from "./regras.ts";
 
 const CHAVE = "falcao-pj-v1";
-const VERSAO = 1;
+const VERSAO = 2;
 
 export type Situacao = "estimado" | "confirmado" | "contrato";
 
@@ -27,7 +27,30 @@ export const LIMITES = {
   /** Letras de um texto ou de uma anotação do contrato. */
   texto: 300,
   dependentes: 20,
+  /** Linhas na lista de outros gastos. */
+  gastos: 20,
 } as const;
+
+/** Os tipos de gasto que a pessoa soma ao contador e às taxas, que toda empresa tem. */
+export const TIPOS_DE_GASTO = {
+  assinatura: "Assinatura",
+  saude: "Plano de saúde",
+  equipamento: "Equipamento",
+  internet: "Internet e celular",
+  coworking: "Coworking",
+  despachante: "Despachante",
+  seguro: "Seguro",
+  previdencia: "Previdência privada",
+  outro: "Outro gasto",
+} as const;
+
+export type TipoDeGasto = keyof typeof TIPOS_DE_GASTO;
+
+/** Um gasto do mês, já na parte que cabe à pessoa. */
+export interface Gasto {
+  tipo: TipoDeGasto;
+  valor: number;
+}
 
 /** Dias úteis de um ano, o máximo de folga ou de feriados sem receber. */
 const DIAS_UTEIS_NO_ANO = REGRAS.diasUteisPorMes * 12;
@@ -184,13 +207,8 @@ export interface Estado {
   hoje: { salario: number; dependentes: number; recebe13Ferias: boolean; temFgts: boolean };
   contrato: Record<string, ItemContrato>;
   empresa: { proLaboreRegra: RegraProLabore; proLaboreValor: number; pessoasNoCnpj: number };
-  custos: {
-    contador: number;
-    taxas: number;
-    assinaturaTotal: number;
-    assinaturaPessoas: number;
-    outros: number;
-  };
+  /** Contador e taxas, que toda empresa tem, e a lista do resto. */
+  custos: { contador: number; taxas: number; gastos: Gasto[] };
 }
 
 const REGRAS_PRO_LABORE: RegraProLabore[] = ["fatorR", "isento", "minimo", "outro"];
@@ -204,7 +222,7 @@ function base(): Estado {
     hoje: { salario: 6000, dependentes: 0, recebe13Ferias: true, temFgts: false },
     contrato,
     empresa: { proLaboreRegra: "fatorR", proLaboreValor: 5000, pessoasNoCnpj: 1 },
-    custos: { contador: 300, taxas: 40, assinaturaTotal: 0, assinaturaPessoas: 1, outros: 0 },
+    custos: { contador: 300, taxas: 40, gastos: [] },
   };
 }
 
@@ -236,11 +254,38 @@ function mesclar<T extends object>(
   }
 }
 
+/**
+ * Os outros gastos de um arquivo, cada um com tipo conhecido e valor no limite. O formato
+ * de antes (`assinaturaTotal` dividida por `assinaturaPessoas`, e um `outros` só) vira lista.
+ */
+function lerGastos(custos: Record<string, unknown>): Gasto[] {
+  if (Array.isArray(custos.gastos))
+    return custos.gastos
+      .filter(ehObjeto)
+      .slice(0, LIMITES.gastos)
+      .map((g) => ({
+        tipo:
+          typeof g.tipo === "string" && Object.hasOwn(TIPOS_DE_GASTO, g.tipo)
+            ? (g.tipo as TipoDeGasto)
+            : "outro",
+        valor: numeroOu(g.valor, 0),
+      }));
+  const antigos: Gasto[] = [];
+  const assinatura =
+    numeroOu(custos.assinaturaTotal, 0) / Math.max(1, numeroOu(custos.assinaturaPessoas, 1));
+  if (assinatura > 0)
+    antigos.push({ tipo: "assinatura", valor: Math.round(assinatura * 100) / 100 });
+  const outros = numeroOu(custos.outros, 0);
+  if (outros > 0) antigos.push({ tipo: "outro", valor: outros });
+  return antigos;
+}
+
 export function normalizar(entrada: unknown, modelo: Estado = base()): Estado {
   if (!ehObjeto(entrada)) throw new Error("O arquivo não tem os dados do consultor.");
   mesclar(modelo.hoje, entrada.hoje, { dependentes: LIMITES.dependentes });
   mesclar(modelo.empresa, entrada.empresa);
   mesclar(modelo.custos, entrada.custos);
+  if (ehObjeto(entrada.custos)) modelo.custos.gastos = lerGastos(entrada.custos);
   if (!REGRAS_PRO_LABORE.includes(modelo.empresa.proLaboreRegra))
     modelo.empresa.proLaboreRegra = "fatorR";
   modelo.empresa.pessoasNoCnpj = Math.min(4, Math.max(1, Math.round(modelo.empresa.pessoasNoCnpj)));
@@ -307,7 +352,9 @@ export function parametros(e: Estado): Parametros {
   return {
     ...e.hoje,
     ...e.empresa,
-    ...e.custos,
+    contador: e.custos.contador,
+    taxas: e.custos.taxas,
+    outros: e.custos.gastos.reduce((soma, g) => soma + g.valor, 0),
     brutoMensal: numero("brutoMensal"),
     horasMes: numero("horasMes"),
     folgaDias: numero("folgaDias"),
